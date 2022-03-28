@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 #
-# Script para mostrar qual o seu IP externo
-# tanto v4 quanto v6
+# pt_BR
+# Script para mostrar qual o seu IPv4 local e IP externo
+# tanto v4 quanto v6 se e houver.
+# ------------------------------------------------------
+# en_US
+# Script to show your local IPv4 and public IPv4 and IPv6
+# if exists.
+# ------------------------------------------------------
+# Usage:
+# First change permissions to excute: chmod +x meuip
+# ./meuip
+# or put it in your bin path
+
 
 server="https://marantech.com.br/getip.php"
 if ! which wget > /dev/null ; then
