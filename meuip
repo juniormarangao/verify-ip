@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# Script para mostrar qual o seu IP externo
+# tanto v4 quanto v6
+
+server="https://marantech.com.br/getip.php"
+if ! which wget > /dev/null ; then
+	echo -e "\nFalta o WGET\n"
+	exit 1
+fi
+
+if ! wget -q --spider ""$server; then
+	echo -e "\n\033[01mVocê está sem internet!\033[00m\n"
+	exit 1
+fi
+
+v4_local=$(ip a | grep inet | sed '/127\.0\.0\.1/d' | sed '/inet6/d' | cut -d '/' -f1 | sed 's/ inet //g' | sed 's/ //g')
+v4=$(curl -s -4 "$server" | head -n1)
+v6=$(curl -s -6 "$server" | head -n1)
+
+echo -e "\n\033[01mSeu IPv4 Local é \033[01;31m$v4_local\033[00m"
+
+echo -e "\n\033[01mSeu IPv4 Público é \033[01;31m$v4\033[00m"
+
+if [[ -n $v6 ]]; then
+	echo -e "\n\033[01mSeu IPv6 é \033[01;31m$v6\033[00m
+	"
+else
+	echo -e "
+	\033[01;31mSem IPv6\033[00m
+	"
+fi
