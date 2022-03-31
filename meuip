@@ -12,32 +12,86 @@
 # First change permissions to excute: chmod +x meuip
 # ./meuip
 # or put it in your bin path
-
+# ------------------------------------------------------
+# 
+# Created by Marangão - September, 2021
+# contato@marantech.com.br
+# https://marantech.com.br
+# https://github.com/juniormarangao
 
 server="https://marantech.com.br/getip.php"
-if ! which wget > /dev/null ; then
-	echo -e "\nFalta o WGET\n"
-	exit 1
-fi
 
-if ! wget -q --spider ""$server; then
-	echo -e "\n\033[01mVocê está sem internet!\033[00m\n"
-	exit 1
-fi
+readonly programneed=(curl wget) # Array of dependencies
 
-v4_local=$(ip a | grep inet | sed '/127\.0\.0\.1/d' | sed '/inet6/d' | cut -d '/' -f1 | sed 's/ inet //g' | sed 's/ //g')
-v4=$(curl -s -4 "$server" | head -n1)
-v6=$(curl -s -6 "$server" | head -n1)
+checkProgramneedPT(){
+	local error=0
+	for command in "${programneed[@]}"; do
+		if ! which "$command" > /dev/null ; then
+			echo -e "\nFalta o $command\n"
+			error=1
+		fi
+	done
+	if [[ "$error" -ne "0" ]]; then
+		echo -e "\nInstale os programas listados acima\n"
+		exit 1
+	fi
+}
+checkProgramneedEN(){
+	local error=0
+	for command in "${programneed[@]}"; do
+		if ! which "$command" > /dev/null ; then
+			echo -e "\nNeed $command\n"
+			error=1
+		fi
+	done
+	if [[ "$error" -ne "0" ]]; then
+		echo -e "\nInstall the listed programs up above\n"
+		exit 1
+	fi
+}
 
-echo -e "\n\033[01mSeu IPv4 Local é \033[01;31m$v4_local\033[00m"
+if [[ "$(grep -o '^.....' <<< $LANG)" = "pt_BR" ]]; then
+	if ! wget -q --spider ""$server; then
+		echo -e "\n\033[01mVocê está sem internet!\033[00m\n"
+		exit 1
+	fi
 
-echo -e "\n\033[01mSeu IPv4 Público é \033[01;31m$v4\033[00m"
+	v4_local=$(ip a | grep inet | sed '/127\.0\.0\.1/d' | sed '/inet6/d' | cut -d '/' -f1 | sed 's/ inet //g' | sed 's/ //g')
+	v4=$(curl -s -4 "$server" | head -n1)
+	v6=$(curl -s -6 "$server" | head -n1)
 
-if [[ -n $v6 ]]; then
-	echo -e "\n\033[01mSeu IPv6 é \033[01;31m$v6\033[00m
-	"
+	echo -e "\n\033[01mSeu IPv4 Local é \033[01;31m$v4_local\033[00m"
+
+	echo -e "\n\033[01mSeu IPv4 Público é \033[01;31m$v4\033[00m"
+
+	if [[ -n $v6 ]]; then
+		echo -e "\n\033[01mSeu IPv6 é \033[01;31m$v6\033[00m
+		"
+	else
+		echo -e "
+		\033[01;31mSem IPv6\033[00m
+		"
+	fi
 else
-	echo -e "
-	\033[01;31mSem IPv6\033[00m
-	"
+	if ! wget -q --spider ""$server; then
+		echo -e "\n\033[01mCheck your Internet connection!\033[00m\n"
+		exit 1
+	fi
+
+	v4_local=$(ip a | grep inet | sed '/127\.0\.0\.1/d' | sed '/inet6/d' | cut -d '/' -f1 | sed 's/ inet //g' | sed 's/ //g')
+	v4=$(curl -s -4 "$server" | head -n1)
+	v6=$(curl -s -6 "$server" | head -n1)
+
+	echo -e "\n\033[01mYour Local IPv4 is \033[01;31m$v4_local\033[00m"
+
+	echo -e "\n\033[01mYour Public IPv4 is \033[01;31m$v4\033[00m"
+
+	if [[ -n $v6 ]]; then
+		echo -e "\n\033[01mYour IPv6 is \033[01;31m$v6\033[00m
+		"
+	else
+		echo -e "
+		\033[01;31mNo IPv6\033[00m
+		"
+	fi
 fi
